@@ -1,0 +1,20 @@
+// Thu thập log từ hệ điều hành (journald)
+loki.source.journal "os_logs" {
+  forward_to = [loki.write.local.receiver]
+}
+
+// Thu thập log của các Pod trong K3s
+local.file_match "pod_logs" {
+  path_targets = [{"__path__" = "/var/log/pods/*/*/*.log"}]
+}
+loki.source.file "k8s_logs" {
+  targets    = local.file_match.pod_logs.targets
+  forward_to = [loki.write.local.receiver]
+}
+
+// Gửi toàn bộ dữ liệu về Loki Gateway
+loki.write "local" {
+  endpoint {
+    url = "http://{{ loki_gateway_ip }}:80/loki/api/v1/push"
+  }
+}

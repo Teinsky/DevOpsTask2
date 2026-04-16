@@ -1,0 +1,58 @@
+---
+- name: Deploy Grafana Alloy as Log Agent
+  hosts: master
+  become: yes
+  vars:
+    loki_gateway_ip: "10.43.222.77"
+
+  tasks:
+    - name: Cài đặt các gói phụ trợ
+      apt:
+        name:
+          - apt-transport-https
+          - software-properties-common
+          - wget
+        state: present
+
+    - name: Thêm Grafana GPG key
+      apt_key:
+        url: https://apt.grafana.com/gpg.key
+        state: present
+
+    - name: Thêm Grafana Repository
+      apt_repository:
+        repo: "deb https://apt.grafana.com/ stable main"
+        state: present
+
+    - name: Cài đặt Grafana Alloy
+      apt:
+        name: alloy
+        state: present
+        update_cache: yes
+
+    - name: Tạo thư mục cấu hình quyền cho systemd
+      file:
+        path: /etc/systemd/system/alloy.service.d
+        state: directory
+
+    - name: Cấp quyền root cho tiến trình Alloy để đọc log K3s
+      copy:
+        dest: /etc/systemd/system/alloy.service.d/override.conf
+        content: |
+          [Service]
+          User=root
+          Group=root
+
+    - name: Đẩy cấu hình vào các node
+      template:
+        src: config.alloy.j2
+        dest: /etc/alloy/config.alloy
+      notify: restart alloy
+
+  handlers:
+    - name: restart alloy
+      systemd:
+        daemon_reload: yes
+        name: alloy
+        state: restarted
+        enabled: yes

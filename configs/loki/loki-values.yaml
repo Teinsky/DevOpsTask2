@@ -1,0 +1,38 @@
+loki:
+  auth_enabled: false
+  commonConfig:
+    replication_factor: 2
+  storage:
+    type: s3
+    bucketNames:
+      chunks: loki-logs
+      ruler: loki-logs
+      admin: loki-logs
+    s3:
+      endpoint: http://192.168.137.11:7480
+      region: us-east-1
+      accessKeyId: "ZCYJ1XIPB2QT15J6FKWJ"
+      secretAccessKey: "q2OpgwRxPNUGsD96Ag2Gt298T6ICJtV3ad7nISpU"
+      s3ForcePathStyle: true
+      insecure: true
+  schemaConfig:
+    configs:
+      - from: "2024-01-01"
+        object_store: s3
+        store: tsdb
+        schema: v13
+        index:
+          prefix: index_
+          period: 24h
+write:
+  replicas: 2
+  persistence:
+    storageClass: ceph-block
+    size: 5Gi
+read:
+  replicas: 2
+backend:
+  replicas: 2
+  persistence:
+    storageClass: ceph-block
+    size: 5Gi

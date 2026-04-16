@@ -1,0 +1,14 @@
+csiConfig:
+  - clusterID: "86a2bb28-ba98-4760-91e2-c04db3ec51ce"
+    monitors:
+      - "192.168.137.11:3300"
+      - "192.168.137.12:3300"
+      - "192.168.137.13:3300"
+provisioner:
+  replicaCount: 2
+plugin:
+  kubeletDir: /var/lib/kubelet
+  nodeplugin:
+    httpMetrics:
+      containerPort: 8092
+    nodeAffinity: {}

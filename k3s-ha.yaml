@@ -1,0 +1,31 @@
+---
+- name: Deploy K3s HA Cluster with Embedded etcd
+  hosts: master
+  become: yes
+  tasks:
+    - name: Cài đặt K3s trên Master đầu tiên (host1) với cờ --cluster-init
+      shell: >
+        curl -sfL https://get.k3s.io |
+        INSTALL_K3S_VERSION="{{ k3s_version }}"
+        K3S_TOKEN="{{ k3s_token }}"
+        sh -s - server
+        --cluster-init
+        --tls-san host1,host2,host3
+      when: inventory_hostname == 'host1'
+
+    - name: Chờ etcd trên host1 khởi tạo hoàn tất
+      wait_for:
+        port: 6443
+        delay: 15
+        timeout: 300
+      when: inventory_hostname == 'host1'
+
+    - name: Cài đặt K3s trên các Master còn lại (host2, host3) và join vào cụm
+      shell: >
+        curl -sfL https://get.k3s.io |
+        INSTALL_K3S_VERSION="{{ k3s_version }}"
+        K3S_TOKEN="{{ k3s_token }}"
+        sh -s - server
+        --server https://192.168.137.11:6443
+        --tls-san host1,host2,host3
+      when: inventory_hostname != 'host1'
