@@ -2,10 +2,13 @@
 - name: Deploy Grafana Alloy as Log Agent
   hosts: master
   become: yes
-  vars:
-    loki_gateway_ip: "10.43.222.77"
 
   tasks:
+    - name: Lấy ClusterIP của Loki Gateway một cách tự động
+      shell: "kubectl get svc loki-gateway -n monitoring -o jsonpath='{.spec.clusterIP}'"
+      register: detected_loki_ip
+      changed_when: false
+
     - name: Cài đặt các gói phụ trợ
       apt:
         name:
@@ -47,6 +50,8 @@
       template:
         src: config.alloy.j2
         dest: /etc/alloy/config.alloy
+      vars:
+        loki_gateway_ip: "{{ detected_loki_ip.stdout }}"
       notify: restart alloy
 
   handlers:

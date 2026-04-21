@@ -11,8 +11,8 @@ loki:
     s3:
       endpoint: http://192.168.137.11:7480
       region: us-east-1
-      accessKeyId: "ZCYJ1XIPB2QT15J6FKWJ"
-      secretAccessKey: "q2OpgwRxPNUGsD96Ag2Gt298T6ICJtV3ad7nISpU"
+      accessKeyId: "68PX343S01QLYSW1L8H8"
+      secretAccessKey: "MREhVOBuvFrUAqDE8Nusf61PtFY80kuXet2RiMFD"
       s3ForcePathStyle: true
       insecure: true
   schemaConfig:

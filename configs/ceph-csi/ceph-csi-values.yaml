@@ -1,5 +1,5 @@
 csiConfig:
-  - clusterID: "86a2bb28-ba98-4760-91e2-c04db3ec51ce"
+  - clusterID: "f3d92a20-15cc-4820-a4d3-43894c625b8f"
     monitors:
       - "192.168.137.11:3300"
       - "192.168.137.12:3300"
